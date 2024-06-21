@@ -14,11 +14,31 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+# admin_py/urls.py
+
+# admin_py/urls.py
+
+# admin_py/urls.py
+
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework import routers
+from chambita_python.views import RegisterView, LoginView, UserViewSet, RolViewSet, DatosPostulantesViewSet, SectorViewSet, EmpresaViewSet, OfertaTrabajoViewSet, PostulacionViewSet, ContratacionViewSet
+
+router = routers.DefaultRouter()
+router.register(r'users', UserViewSet)
+router.register(r'roles', RolViewSet)
+router.register(r'datospostulantes', DatosPostulantesViewSet)
+router.register(r'sectores', SectorViewSet)
+router.register(r'empresas', EmpresaViewSet)
+router.register(r'ofertas', OfertaTrabajoViewSet)
+router.register(r'postulaciones', PostulacionViewSet)
+router.register(r'contrataciones', ContratacionViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('chambita_python.urls')), 
-    path('account/',include('django.contrib.auth.urls')),
+    path('api/', include(router.urls)),
+    path('api/register/', RegisterView.as_view(), name='register'),
+    path('api/login/', LoginView.as_view(), name='login'),
+    path('account/', include('django.contrib.auth.urls')),
 ]

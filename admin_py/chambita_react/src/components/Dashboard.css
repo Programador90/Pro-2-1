@@ -1,0 +1,42 @@
+/* Dashboard.css */
+
+.dashboard-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+  }
+  
+  .dashboard-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .dashboard-link {
+    flex: 1 1 calc(33.333% - 10px); /* 3 columns layout with gap */
+    margin: 10px 0;
+    padding: 10px;
+    text-decoration: none;
+    color: white;
+    background-color: #007bff;
+    border-radius: 5px;
+    text-align: center;
+    transition: background-color 0.3s;
+  }
+  
+  .dashboard-link:hover {
+    background-color: #0056b3;
+  }
+  
+  @media (max-width: 768px) {
+    .dashboard-link {
+      flex: 1 1 calc(50% - 10px); /* 2 columns layout on medium screens */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .dashboard-link {
+      flex: 1 1 100%; /* 1 column layout on small screens */
+    }
+  }
+  
