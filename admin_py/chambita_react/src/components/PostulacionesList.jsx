@@ -5,8 +5,8 @@ const PostulacionesList = () => {
   const [postulaciones, setPostulaciones] = useState([]);
   const [ofertas, setOfertas] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
-  const [newPostulacion, setNewPostulacion] = useState({ fecha_inicio: '', oferta_trabajo: 1, usuario: 1 });
-  const [editPostulacion, setEditPostulacion] = useState({ fecha_inicio: '', oferta_trabajo: 1, usuario: 1 });
+  const [newPostulacion, setNewPostulacion] = useState({ fecha_inicio: '', oferta_trabajo: '', usuario: '' });
+  const [editPostulacion, setEditPostulacion] = useState({ fecha_inicio: '', oferta_trabajo: '', usuario: '' });
   const [editId, setEditId] = useState(null);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const PostulacionesList = () => {
   };
 
   const fetchOfertas = () => {
-    axios.get('/ofertas_trabajo/')
+    axios.get('/ofertas/')
       .then(response => {
         setOfertas(response.data);
       })
@@ -36,7 +36,7 @@ const PostulacionesList = () => {
   };
 
   const fetchUsuarios = () => {
-    axios.get('/usuarios/')
+    axios.get('/users/')
       .then(response => {
         setUsuarios(response.data);
       })
@@ -49,7 +49,7 @@ const PostulacionesList = () => {
     axios.post('/postulaciones/', newPostulacion)
       .then(response => {
         fetchPostulaciones();
-        setNewPostulacion({ fecha_inicio: '', oferta_trabajo: 1, usuario: 1 });
+        setNewPostulacion({ fecha_inicio: '', oferta_trabajo: '', usuario: '' });
       })
       .catch(error => {
         console.error("Hubo un error al añadir la postulación:", error);
@@ -61,7 +61,7 @@ const PostulacionesList = () => {
       .then(response => {
         fetchPostulaciones();
         setEditId(null);
-        setEditPostulacion({ fecha_inicio: '', oferta_trabajo: 1, usuario: 1 });
+        setEditPostulacion({ fecha_inicio: '', oferta_trabajo: '', usuario: '' });
       })
       .catch(error => {
         console.error("Hubo un error al actualizar la postulación:", error);
@@ -85,7 +85,7 @@ const PostulacionesList = () => {
 
   const getUsuarioName = (id) => {
     const usuario = usuarios.find(usuario => usuario.id === id);
-    return usuario ? usuario.nombre : '';
+    return usuario ? usuario.first_name : '';
   };
 
   return (
@@ -93,17 +93,19 @@ const PostulacionesList = () => {
       <h1 className="my-4">Postulaciones</h1>
       <ul className="list-group">
         {postulaciones.map(postulacion => (
-          <li key={postulacion.id} className="list-group-item d-flex justify-content-between align-items-center">
+          <li key={postulacion.id} className="list-group-item">
             {editId === postulacion.id ? (
-              <>
+              <div className="d-flex justify-content-between align-items-center">
                 <input
-                  type="text"
+                  type="date"
                   value={editPostulacion.fecha_inicio}
                   onChange={(e) => setEditPostulacion({ ...editPostulacion, fecha_inicio: e.target.value })}
+                  className="form-control my-1"
                 />
                 <select
                   value={editPostulacion.oferta_trabajo}
                   onChange={(e) => setEditPostulacion({ ...editPostulacion, oferta_trabajo: e.target.value })}
+                  className="form-control my-1"
                 >
                   {ofertas.map(oferta => (
                     <option key={oferta.id} value={oferta.id}>{oferta.titulo}</option>
@@ -112,32 +114,39 @@ const PostulacionesList = () => {
                 <select
                   value={editPostulacion.usuario}
                   onChange={(e) => setEditPostulacion({ ...editPostulacion, usuario: e.target.value })}
+                  className="form-control my-1"
                 >
                   {usuarios.map(usuario => (
-                    <option key={usuario.id} value={usuario.id}>{usuario.nombre}</option>
+                    <option key={usuario.id} value={usuario.id}>{usuario.first_name}</option>
                   ))}
                 </select>
-              </>
+                <button className="btn btn-success my-1" onClick={() => updatePostulacion(postulacion.id)}>Guardar</button>
+              </div>
             ) : (
-              <>
-                {postulacion.id} - {postulacion.fecha_inicio} - {getOfertaTitulo(postulacion.oferta_trabajo)} - {getUsuarioName(postulacion.usuario)}
-              </>
+              <div>
+                <p>ID: {postulacion.id}</p>
+                <p>Fecha de Inicio: {postulacion.fecha_inicio}</p>
+                <p>Oferta de Trabajo: {getOfertaTitulo(postulacion.oferta_trabajo)}</p>
+                <p>Usuario: {getUsuarioName(postulacion.usuario)}</p>
+              </div>
             )}
             <div>
               {editId === postulacion.id ? (
-                <button onClick={() => updatePostulacion(postulacion.id)}>Save</button>
+                <button className="btn btn-secondary my-1" onClick={() => setEditId(null)}>Cancelar</button>
               ) : (
-                <button onClick={() => { setEditId(postulacion.id); setEditPostulacion(postulacion); }}>Edit</button>
+                <div className="d-flex justify-content-end">
+                  <button className="btn btn-warning mr-2 my-1" onClick={() => { setEditId(postulacion.id); setEditPostulacion(postulacion); }}>Editar</button>
+                  <button className="btn btn-danger my-1" onClick={() => deletePostulacion(postulacion.id)}>Eliminar</button>
+                </div>
               )}
-              <button onClick={() => deletePostulacion(postulacion.id)}>Delete</button>
             </div>
           </li>
         ))}
       </ul>
       <div className="my-4">
-        <h2>Add New Postulacion</h2>
+        <h2>Añadir Nueva Postulación</h2>
         <input
-          type="text"
+          type="date"
           value={newPostulacion.fecha_inicio}
           onChange={(e) => setNewPostulacion({ ...newPostulacion, fecha_inicio: e.target.value })}
           placeholder="Fecha de Inicio"
@@ -148,7 +157,7 @@ const PostulacionesList = () => {
           onChange={(e) => setNewPostulacion({ ...newPostulacion, oferta_trabajo: e.target.value })}
           className="form-control my-1"
         >
-          <option value="">Select Oferta de Trabajo</option>
+          <option value="">Selecciona una Oferta de Trabajo</option>
           {ofertas.map(oferta => (
             <option key={oferta.id} value={oferta.id}>{oferta.titulo}</option>
           ))}
@@ -158,12 +167,12 @@ const PostulacionesList = () => {
           onChange={(e) => setNewPostulacion({ ...newPostulacion, usuario: e.target.value })}
           className="form-control my-1"
         >
-          <option value="">Select Usuario</option>
+          <option value="">Selecciona un Usuario</option>
           {usuarios.map(usuario => (
-            <option key={usuario.id} value={usuario.id}>{usuario.nombre}</option>
+            <option key={usuario.id} value={usuario.id}>{usuario.first_name}</option>
           ))}
         </select>
-        <button onClick={addPostulacion} className="btn btn-primary my-2">Add Postulacion</button>
+        <button onClick={addPostulacion} className="btn btn-primary my-2">Añadir Postulación</button>
       </div>
     </div>
   );

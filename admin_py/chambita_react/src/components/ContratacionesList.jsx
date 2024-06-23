@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../services/axiosConfig';
 
+
 const ContratacionesList = () => {
   const [contrataciones, setContrataciones] = useState([]);
   const [ofertas, setOfertas] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
-  const [newContratacion, setNewContratacion] = useState({ fecha_inicio: '', oferta_trabajo: 1, usuario: 1 });
-  const [editContratacion, setEditContratacion] = useState({ fecha_inicio: '', oferta_trabajo: 1, usuario: 1 });
+  const [newContratacion, setNewContratacion] = useState({ oferta_trabajo: '', usuario: '' });
+  const [editContratacion, setEditContratacion] = useState({ oferta_trabajo: '', usuario: '' });
   const [editId, setEditId] = useState(null);
 
   useEffect(() => {
@@ -26,7 +27,7 @@ const ContratacionesList = () => {
   };
 
   const fetchOfertas = () => {
-    axios.get('/ofertas_trabajo/')
+    axios.get('/ofertas/')
       .then(response => {
         setOfertas(response.data);
       })
@@ -36,7 +37,7 @@ const ContratacionesList = () => {
   };
 
   const fetchUsuarios = () => {
-    axios.get('/usuarios/')
+    axios.get('/users/')
       .then(response => {
         setUsuarios(response.data);
       })
@@ -49,7 +50,7 @@ const ContratacionesList = () => {
     axios.post('/contrataciones/', newContratacion)
       .then(response => {
         fetchContrataciones();
-        setNewContratacion({ fecha_inicio: '', oferta_trabajo: 1, usuario: 1 });
+        setNewContratacion({ oferta_trabajo: '', usuario: '' });
       })
       .catch(error => {
         console.error("Hubo un error al añadir la contratación:", error);
@@ -61,7 +62,7 @@ const ContratacionesList = () => {
       .then(response => {
         fetchContrataciones();
         setEditId(null);
-        setEditContratacion({ fecha_inicio: '', oferta_trabajo: 1, usuario: 1 });
+        setEditContratacion({ oferta_trabajo: '', usuario: '' });
       })
       .catch(error => {
         console.error("Hubo un error al actualizar la contratación:", error);
@@ -85,70 +86,77 @@ const ContratacionesList = () => {
 
   const getUsuarioName = (id) => {
     const usuario = usuarios.find(usuario => usuario.id === id);
-    return usuario ? usuario.nombre : '';
+    return usuario ? `${usuario.first_name} ${usuario.last_name}` : 'Desconocido';
   };
 
   return (
     <div className="container">
       <h1 className="my-4">Contrataciones</h1>
-      <ul className="list-group">
-        {contrataciones.map(contratacion => (
-          <li key={contratacion.id} className="list-group-item d-flex justify-content-between align-items-center">
-            {editId === contratacion.id ? (
-              <>
-                <input
-                  type="text"
-                  value={editContratacion.fecha_inicio}
-                  onChange={(e) => setEditContratacion({ ...editContratacion, fecha_inicio: e.target.value })}
-                />
-                <select
-                  value={editContratacion.oferta_trabajo}
-                  onChange={(e) => setEditContratacion({ ...editContratacion, oferta_trabajo: e.target.value })}
-                >
-                  {ofertas.map(oferta => (
-                    <option key={oferta.id} value={oferta.id}>{oferta.titulo}</option>
-                  ))}
-                </select>
-                <select
-                  value={editContratacion.usuario}
-                  onChange={(e) => setEditContratacion({ ...editContratacion, usuario: e.target.value })}
-                >
-                  {usuarios.map(usuario => (
-                    <option key={usuario.id} value={usuario.id}>{usuario.nombre}</option>
-                  ))}
-                </select>
-              </>
-            ) : (
-              <>
-                {contratacion.id} - {contratacion.fecha_inicio} - {getOfertaTitulo(contratacion.oferta_trabajo)} - {getUsuarioName(contratacion.usuario)}
-              </>
-            )}
-            <div>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Oferta</th>
+            <th>Usuario</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {contrataciones.map(contratacion => (
+            <tr key={contratacion.id}>
               {editId === contratacion.id ? (
-                <button onClick={() => updateContratacion(contratacion.id)}>Save</button>
+                <>
+                  <td>{contratacion.id}</td>
+                  <td>
+                    <select
+                      value={editContratacion.oferta_trabajo}
+                      onChange={(e) => setEditContratacion({ ...editContratacion, oferta_trabajo: e.target.value })}
+                    >
+                      <option value="">Selecciona una Oferta de Trabajo</option>
+                      {ofertas.map(oferta => (
+                        <option key={oferta.id} value={oferta.id}>{oferta.titulo}</option>
+                      ))}
+                    </select>
+                  </td>
+                  <td>
+                    <select
+                      value={editContratacion.usuario}
+                      onChange={(e) => setEditContratacion({ ...editContratacion, usuario: e.target.value })}
+                    >
+                      <option value="">Selecciona un Usuario</option>
+                      {usuarios.map(usuario => (
+                        <option key={usuario.id} value={usuario.id}>{`${usuario.first_name} ${usuario.last_name}`}</option>
+                      ))}
+                    </select>
+                  </td>
+                  <td>
+                    <button className="btn btn-success" onClick={() => updateContratacion(contratacion.id)}>Guardar</button>
+                    <button className="btn btn-secondary" onClick={() => setEditId(null)}>Cancelar</button>
+                  </td>
+                </>
               ) : (
-                <button onClick={() => { setEditId(contratacion.id); setEditContratacion(contratacion); }}>Edit</button>
+                <>
+                  <td>{contratacion.id}</td>
+                  <td>{getOfertaTitulo(contratacion.oferta_trabajo)}</td>
+                  <td>{getUsuarioName(contratacion.usuario)}</td>
+                  <td>
+                    <button className="btn btn-warning" onClick={() => { setEditId(contratacion.id); setEditContratacion(contratacion); }}>Editar</button>
+                    <button className="btn btn-danger" onClick={() => deleteContratacion(contratacion.id)}>Eliminar</button>
+                  </td>
+                </>
               )}
-              <button onClick={() => deleteContratacion(contratacion.id)}>Delete</button>
-            </div>
-          </li>
-        ))}
-      </ul>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <div className="my-4">
-        <h2>Add New Contratacion</h2>
-        <input
-          type="text"
-          value={newContratacion.fecha_inicio}
-          onChange={(e) => setNewContratacion({ ...newContratacion, fecha_inicio: e.target.value })}
-          placeholder="Fecha de Inicio"
-          className="form-control my-1"
-        />
+        <h2>Añadir Nueva Contratación</h2>
         <select
           value={newContratacion.oferta_trabajo}
           onChange={(e) => setNewContratacion({ ...newContratacion, oferta_trabajo: e.target.value })}
           className="form-control my-1"
         >
-          <option value="">Select Oferta de Trabajo</option>
+          <option value="">Selecciona una Oferta de Trabajo</option>
           {ofertas.map(oferta => (
             <option key={oferta.id} value={oferta.id}>{oferta.titulo}</option>
           ))}
@@ -158,12 +166,12 @@ const ContratacionesList = () => {
           onChange={(e) => setNewContratacion({ ...newContratacion, usuario: e.target.value })}
           className="form-control my-1"
         >
-          <option value="">Select Usuario</option>
+          <option value="">Selecciona un Usuario</option>
           {usuarios.map(usuario => (
-            <option key={usuario.id} value={usuario.id}>{usuario.nombre}</option>
+            <option key={usuario.id} value={usuario.id}>{`${usuario.first_name} ${usuario.last_name}`}</option>
           ))}
         </select>
-        <button onClick={addContratacion} className="btn btn-primary my-2">Add Contratacion</button>
+        <button onClick={addContratacion} className="btn btn-primary my-2">Añadir Contratación</button>
       </div>
     </div>
   );

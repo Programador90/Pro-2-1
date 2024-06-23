@@ -20,9 +20,13 @@ Including another URLconf
 
 # admin_py/urls.py
 
+# urls.py del proyecto principal
+
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
+from django.conf import settings
+from django.conf.urls.static import static
 from chambita_python.views import RegisterView, LoginView, UserViewSet, RolViewSet, DatosPostulantesViewSet, SectorViewSet, EmpresaViewSet, OfertaTrabajoViewSet, PostulacionViewSet, ContratacionViewSet
 
 router = routers.DefaultRouter()
@@ -42,3 +46,7 @@ urlpatterns = [
     path('api/login/', LoginView.as_view(), name='login'),
     path('account/', include('django.contrib.auth.urls')),
 ]
+
+# Agrega estas líneas para servir archivos de media durante el desarrollo
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

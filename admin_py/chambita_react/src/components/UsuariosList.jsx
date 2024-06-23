@@ -72,139 +72,115 @@ const UsuariosList = () => {
   };
 
   return (
-    <div>
-      <div className="d-flex justify-content-between align-items-center my-4">
-        <h2>Lista de Usuarios</h2>
+    <div className="container">
+      <h2 className="my-4">Usuarios</h2>
+      <div className="card mb-4">
+        <div className="card-header">Datos de mi base de datos</div>
+        <ul className="list-group list-group-flush">
+          {usuarios.map(usuario => (
+            <li key={usuario.id} className="list-group-item d-flex justify-content-between align-items-center">
+              {editId === usuario.id ? (
+                <div className="flex-grow-1">
+                  <input
+                    type="text"
+                    value={editUsuario.first_name}
+                    onChange={(e) => setEditUsuario({ ...editUsuario, first_name: e.target.value })}
+                    className="form-control my-1"
+                  />
+                  <input
+                    type="text"
+                    value={editUsuario.last_name}
+                    onChange={(e) => setEditUsuario({ ...editUsuario, last_name: e.target.value })}
+                    className="form-control my-1"
+                  />
+                  <input
+                    type="email"
+                    value={editUsuario.email}
+                    onChange={(e) => setEditUsuario({ ...editUsuario, email: e.target.value })}
+                    className="form-control my-1"
+                  />
+                  <input
+                    type="password"
+                    value={editUsuario.password}
+                    onChange={(e) => setEditUsuario({ ...editUsuario, password: e.target.value })}
+                    className="form-control my-1"
+                  />
+                  <select
+                    value={editUsuario.rol}
+                    onChange={(e) => setEditUsuario({ ...editUsuario, rol: e.target.value })}
+                    className="form-control my-1"
+                  >
+                    <option value="">Selecciona un rol</option>
+                    {roles.map(rol => (
+                      <option key={rol.id} value={rol.id}>{rol.tipo}</option>
+                    ))}
+                  </select>
+                  <button className="btn btn-success mt-2" onClick={() => updateUsuario(usuario.id)}>Actualizar</button>
+                </div>
+              ) : (
+                <div className="flex-grow-1">
+                  <p>Nombre: {usuario.first_name}</p>
+                  <p>Apellidos: {usuario.last_name}</p>
+                  <p>Email: {usuario.email}</p>
+                  <p>Contraseña: {usuario.password}</p>
+                  <p>Rol: {getRoleName(usuario.rol)}</p>
+                </div>
+              )}
+              {editId === usuario.id ? (
+                <button className="btn btn-danger ml-2" onClick={() => setEditId(null)}>Cancelar</button>
+              ) : (
+                <div>
+                  <button className="btn btn-warning mr-2" onClick={() => { setEditId(usuario.id); setEditUsuario(usuario); }}>Editar</button>
+                  <button className="btn btn-danger" onClick={() => deleteUsuario(usuario.id)}>Eliminar</button>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul className="list-group mb-4">
-        {usuarios.map(usuario => (
-          <li key={usuario.id} className="list-group-item d-flex justify-content-between align-items-center">
-            {editId === usuario.id ? (
-              <div className="flex-grow-1">
-                <input
-                  type="text"
-                  value={editUsuario.first_name}
-                  onChange={(e) => setEditUsuario({ ...editUsuario, first_name: e.target.value })}
-                  className="form-control my-1"
-                />
-                <input
-                  type="text"
-                  value={editUsuario.last_name}
-                  onChange={(e) => setEditUsuario({ ...editUsuario, last_name: e.target.value })}
-                  className="form-control my-1"
-                />
-                <input
-                  type="email"
-                  value={editUsuario.email}
-                  onChange={(e) => setEditUsuario({ ...editUsuario, email: e.target.value })}
-                  className="form-control my-1"
-                />
-                <input
-                  type="password"
-                  value={editUsuario.password}
-                  onChange={(e) => setEditUsuario({ ...editUsuario, password: e.target.value })}
-                  className="form-control my-1"
-                />
-                <select
-                  value={editUsuario.rol}
-                  onChange={(e) => setEditUsuario({ ...editUsuario, rol: e.target.value })}
-                  className="form-control my-1"
-                >
-                  <option value="">Selecciona un rol</option>
-                  {roles.map(rol => (
-                    <option key={rol.id} value={rol.id}>{rol.tipo}</option>
-                  ))}
-                </select>
-                <button className="btn btn-success mt-2" onClick={() => updateUsuario(usuario.id)}>Actualizar</button>
-              </div>
-            ) : (
-              <div className="flex-grow-1">
-                <p>Nombre: {usuario.first_name}</p>
-                <p>Apellidos: {usuario.last_name}</p>
-                <p>Email: {usuario.email}</p>
-                <p>Contraseña: {usuario.password}</p>
-                <p>Rol: {getRoleName(usuario.rol)}</p>
-              </div>
-            )}
-            {editId === usuario.id ? (
-              <button className="btn btn-danger ml-2" onClick={() => setEditId(null)}>Cancelar</button>
-            ) : (
-              <div>
-                <button className="btn btn-warning mr-2" onClick={() => { setEditId(usuario.id); setEditUsuario(usuario); }}>Editar</button>
-                <button className="btn btn-danger" onClick={() => deleteUsuario(usuario.id)}>Eliminar</button>
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
-      <div className="table-responsive">
-        <table className="table table-bordered">
-          <tbody>
-            <tr>
-              <td>
-                <input
-                  type="text"
-                  value={newUsuario.first_name}
-                  onChange={(e) => setNewUsuario({ ...newUsuario, first_name: e.target.value })}
-                  placeholder="Nombre"
-                  className="form-control"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <input
-                  type="text"
-                  value={newUsuario.last_name}
-                  onChange={(e) => setNewUsuario({ ...newUsuario, last_name: e.target.value })}
-                  placeholder="Apellidos"
-                  className="form-control"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <input
-                  type="email"
-                  value={newUsuario.email}
-                  onChange={(e) => setNewUsuario({ ...newUsuario, email: e.target.value })}
-                  placeholder="Email"
-                  className="form-control"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <input
-                  type="password"
-                  value={newUsuario.password}
-                  onChange={(e) => setNewUsuario({ ...newUsuario, password: e.target.value })}
-                  placeholder="Contraseña"
-                  className="form-control"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <select
-                  value={newUsuario.rol}
-                  onChange={(e) => setNewUsuario({ ...newUsuario, rol: e.target.value })}
-                  className="form-control"
-                >
-                  <option value="">Selecciona un rol</option>
-                  {roles.map(rol => (
-                    <option key={rol.id} value={rol.id}>{rol.tipo}</option>
-                  ))}
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td className="text-right">
-                <button className="btn btn-primary" onClick={addUsuario}>Añadir usuario</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div className="card">
+        <div className="card-header">Formulario</div>
+        <div className="card-body">
+          <input
+            type="text"
+            value={newUsuario.first_name}
+            onChange={(e) => setNewUsuario({ ...newUsuario, first_name: e.target.value })}
+            placeholder="Nombre"
+            className="form-control my-1"
+          />
+          <input
+            type="text"
+            value={newUsuario.last_name}
+            onChange={(e) => setNewUsuario({ ...newUsuario, last_name: e.target.value })}
+            placeholder="Apellidos"
+            className="form-control my-1"
+          />
+          <input
+            type="email"
+            value={newUsuario.email}
+            onChange={(e) => setNewUsuario({ ...newUsuario, email: e.target.value })}
+            placeholder="Email"
+            className="form-control my-1"
+          />
+          <input
+            type="password"
+            value={newUsuario.password}
+            onChange={(e) => setNewUsuario({ ...newUsuario, password: e.target.value })}
+            placeholder="Contraseña"
+            className="form-control my-1"
+          />
+          <select
+            value={newUsuario.rol}
+            onChange={(e) => setNewUsuario({ ...newUsuario, rol: e.target.value })}
+            className="form-control my-1"
+          >
+            <option value="">Selecciona un rol</option>
+            {roles.map(rol => (
+              <option key={rol.id} value={rol.id}>{rol.tipo}</option>
+            ))}
+          </select>
+          <button className="btn btn-primary mt-2" onClick={addUsuario}>Añadir Usuario</button>
+        </div>
       </div>
     </div>
   );

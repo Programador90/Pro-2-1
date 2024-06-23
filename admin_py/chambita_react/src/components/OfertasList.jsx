@@ -1,119 +1,116 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../services/axiosConfig';
-import moment from 'moment';
 
-const OfertasList = () => {
+const OfertaList = () => {
   const [ofertas, setOfertas] = useState([]);
-  const [newOferta, setNewOferta] = useState({ titulo: '', descripcion: '', salario: '', requerimientos: '', fecha_publicacion: '', estado: 'activa', empresa: 1 });
-  const [editOferta, setEditOferta] = useState({ titulo: '', descripcion: '', salario: '', requerimientos: '', fecha_publicacion: '', estado: 'activa', empresa: 1 });
-  const [editId, setEditId] = useState(null);
+  const [empresas, setEmpresas] = useState([]);
+  const [newOferta, setNewOferta] = useState({
+    titulo: '',
+    descripcion: '',
+    salario: '',
+    requerimientos: '',
+    fecha_publicacion: '',
+    estado: 'activa',
+    empresa: ''
+  });
+  const [editOferta, setEditOferta] = useState(null);
 
   useEffect(() => {
     fetchOfertas();
+    fetchEmpresas();
   }, []);
 
-  const fetchOfertas = () => {
-    axios.get('/ofertas_trabajo/')
-      .then(response => {
-        setOfertas(response.data);
-      })
-      .catch(error => {
-        console.error("Hubo un error al obtener las ofertas de trabajo:", error);
-      });
-  };
-
-  const addOferta = () => {
-    axios.post('/ofertas_trabajo/', newOferta)
-      .then(response => {
-        fetchOfertas();
-        setNewOferta({ titulo: '', descripcion: '', salario: '', requerimientos: '', fecha_publicacion: '', estado: 'activa', empresa: 1 });
-      })
-      .catch(error => {
-        console.error("Hubo un error al añadir la oferta de trabajo:", error);
-      });
-  };
-
-  const updateOferta = (id) => {
-    axios.put(`/ofertas_trabajo/${id}/`, editOferta)
-      .then(response => {
-        fetchOfertas();
-        setEditId(null);
-        setEditOferta({ titulo: '', descripcion: '', salario: '', requerimientos: '', fecha_publicacion: '', estado: 'activa', empresa: 1 });
-      })
-      .catch(error => {
-        console.error("Hubo un error al actualizar la oferta de trabajo:", error);
-      });
-  };
-
-  const deleteOferta = (id) => {
-    axios.delete(`/ofertas_trabajo/${id}/`)
-      .then(response => {
-        fetchOfertas();
-      })
-      .catch(error => {
-        console.error("Hubo un error al eliminar la oferta de trabajo:", error);
-      });
-  };
-
-  const calculateTimeLeft = (fechaPublicacion) => {
-    const now = moment();
-    const end = moment(fechaPublicacion).add(7, 'days');
-    const diff = end.diff(now);
-
-    if (diff <= 0) {
-      return 'Expirado';
+  const fetchOfertas = async () => {
+    try {
+      const response = await axios.get('/ofertas/');
+      setOfertas(response.data);
+    } catch (error) {
+      console.error("Hubo un error al obtener las ofertas de trabajo:", error);
     }
+  };
 
-    const duration = moment.duration(diff);
-    const days = duration.days();
-    const hours = duration.hours();
-    const minutes = duration.minutes();
-    const seconds = duration.seconds();
+  const fetchEmpresas = async () => {
+    try {
+      const response = await axios.get('/empresas/');
+      setEmpresas(response.data);
+    } catch (error) {
+      console.error("Hubo un error al obtener las empresas:", error);
+    }
+  };
 
-    return `${days} días, ${hours} horas, ${minutes} minutos`;
+  const addOferta = async () => {
+    try {
+      await axios.post('/ofertas/', newOferta);
+      fetchOfertas();
+      setNewOferta({
+        titulo: '',
+        descripcion: '',
+        salario: '',
+        requerimientos: '',
+        fecha_publicacion: '',
+        estado: 'activa',
+        empresa: ''
+      });
+    } catch (error) {
+      console.error("Hubo un error al añadir la oferta de trabajo:", error);
+    }
+  };
+
+  const updateOferta = async (id) => {
+    try {
+      await axios.put(`/ofertas/${id}/`, editOferta);
+      fetchOfertas();
+      setEditOferta(null);
+    } catch (error) {
+      console.error("Hubo un error al actualizar la oferta de trabajo:", error);
+    }
+  };
+
+  const deleteOferta = async (id) => {
+    try {
+      await axios.delete(`/ofertas/${id}/`);
+      fetchOfertas();
+    } catch (error) {
+      console.error("Hubo un error al eliminar la oferta de trabajo:", error);
+    }
   };
 
   return (
-    <div>
-      <div className="my-4">
-        <h2>Ofertas de Trabajo</h2>
-      </div>
+    <div className="container">
+      <h2 className="my-4 text-center">Lista de Ofertas de Trabajo</h2>
       <ul className="list-group mb-4">
         {ofertas.map(oferta => (
           <li key={oferta.id} className="list-group-item d-flex justify-content-between align-items-center">
-            {editId === oferta.id ? (
+            {editOferta && editOferta.id === oferta.id ? (
               <div className="flex-grow-1">
                 <input
                   type="text"
                   value={editOferta.titulo}
                   onChange={(e) => setEditOferta({ ...editOferta, titulo: e.target.value })}
-                  placeholder="Título"
                   className="form-control my-1"
                 />
-                <textarea
+                <input
+                  type="text"
                   value={editOferta.descripcion}
                   onChange={(e) => setEditOferta({ ...editOferta, descripcion: e.target.value })}
-                  placeholder="Descripción"
                   className="form-control my-1"
                 />
                 <input
                   type="number"
                   value={editOferta.salario}
                   onChange={(e) => setEditOferta({ ...editOferta, salario: e.target.value })}
-                  placeholder="Salario"
                   className="form-control my-1"
                 />
-                <textarea
+                <input
+                  type="text"
                   value={editOferta.requerimientos}
                   onChange={(e) => setEditOferta({ ...editOferta, requerimientos: e.target.value })}
-                  placeholder="Requerimientos"
                   className="form-control my-1"
                 />
                 <input
                   type="date"
                   value={editOferta.fecha_publicacion}
                   onChange={(e) => setEditOferta({ ...editOferta, fecha_publicacion: e.target.value })}
-                  placeholder="Fecha de Publicación"
                   className="form-control my-1"
                 />
                 <select
@@ -124,6 +121,16 @@ const OfertasList = () => {
                   <option value="activa">Activa</option>
                   <option value="inactiva">Inactiva</option>
                 </select>
+                <select
+                  value={editOferta.empresa}
+                  onChange={(e) => setEditOferta({ ...editOferta, empresa: e.target.value })}
+                  className="form-control my-1"
+                >
+                  <option value="">Selecciona una empresa</option>
+                  {empresas.map(empresa => (
+                    <option key={empresa.id} value={empresa.id}>{empresa.nombre_comercial}</option>
+                  ))}
+                </select>
                 <button className="btn btn-success mt-2" onClick={() => updateOferta(oferta.id)}>Guardar</button>
               </div>
             ) : (
@@ -132,17 +139,17 @@ const OfertasList = () => {
                 <p>Descripción: {oferta.descripcion}</p>
                 <p>Salario: {oferta.salario}</p>
                 <p>Requerimientos: {oferta.requerimientos}</p>
-                <p>Publicado: {moment(oferta.fecha_publicacion).format('LL')}</p>
-                <p>Tiempo restante: {calculateTimeLeft(oferta.fecha_publicacion)}</p>
+                <p>Fecha de Publicación: {oferta.fecha_publicacion}</p>
                 <p>Estado: {oferta.estado}</p>
+                <p>Empresa: {oferta.empresa.nombre_comercial}</p>
               </div>
             )}
             <div>
-              {editId === oferta.id ? (
-                <button className="btn btn-danger ml-2" onClick={() => setEditId(null)}>Cancelar</button>
+              {editOferta && editOferta.id === oferta.id ? (
+                <button className="btn btn-danger ml-2" onClick={() => setEditOferta(null)}>Cancelar</button>
               ) : (
                 <>
-                  <button className="btn btn-warning mr-2" onClick={() => { setEditId(oferta.id); setEditOferta(oferta); }}>Editar</button>
+                  <button className="btn btn-warning mr-2" onClick={() => setEditOferta(oferta)}>Editar</button>
                   <button className="btn btn-danger" onClick={() => deleteOferta(oferta.id)}>Eliminar</button>
                 </>
               )}
@@ -151,7 +158,7 @@ const OfertasList = () => {
         ))}
       </ul>
       <div className="my-4">
-        <h2>Añadir Nueva Oferta de Trabajo</h2>
+        <h2 className="text-center">Añadir Nueva Oferta de Trabajo</h2>
         <input
           type="text"
           value={newOferta.titulo}
@@ -159,7 +166,8 @@ const OfertasList = () => {
           placeholder="Título"
           className="form-control my-1"
         />
-        <textarea
+        <input
+          type="text"
           value={newOferta.descripcion}
           onChange={(e) => setNewOferta({ ...newOferta, descripcion: e.target.value })}
           placeholder="Descripción"
@@ -172,7 +180,8 @@ const OfertasList = () => {
           placeholder="Salario"
           className="form-control my-1"
         />
-        <textarea
+        <input
+          type="text"
           value={newOferta.requerimientos}
           onChange={(e) => setNewOferta({ ...newOferta, requerimientos: e.target.value })}
           placeholder="Requerimientos"
@@ -193,10 +202,20 @@ const OfertasList = () => {
           <option value="activa">Activa</option>
           <option value="inactiva">Inactiva</option>
         </select>
-        <button className="btn btn-primary mt-2" onClick={addOferta}>Añadir Oferta</button>
+        <select
+          value={newOferta.empresa}
+          onChange={(e) => setNewOferta({ ...newOferta, empresa: e.target.value })}
+          className="form-control my-1"
+        >
+          <option value="">Selecciona una empresa</option>
+          {empresas.map(empresa => (
+            <option key={empresa.id} value={empresa.id}>{empresa.nombre_comercial}</option>
+          ))}
+        </select>
+        <button className="btn btn-primary mt-2" onClick={addOferta}>Añadir Oferta de Trabajo</button>
       </div>
     </div>
   );
 };
 
-export default OfertasList;
+export default OfertaList;

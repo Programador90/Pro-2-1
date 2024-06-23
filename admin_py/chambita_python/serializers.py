@@ -27,9 +27,11 @@ class EmpresaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class OfertaTrabajoSerializer(serializers.ModelSerializer):
+    empresa = EmpresaSerializer()
+
     class Meta:
         model = OfertaTrabajo
-        fields = '__all__'
+        fields = ['id', 'titulo', 'descripcion', 'salario', 'requerimientos', 'fecha_publicacion', 'estado', 'empresa']
 
 class PostulacionSerializer(serializers.ModelSerializer):
     class Meta:

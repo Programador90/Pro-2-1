@@ -1,4 +1,3 @@
-// src/components/Login.jsx
 import React, { useState } from 'react';
 import axios from '../services/axiosConfig';
 import { useNavigate } from 'react-router-dom';
@@ -24,26 +23,24 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      <div className="login-left">
-      
-        
-       
-      </div>
+      <div className="login-left"></div>
       <div className="login-right">
-        <h2>Login</h2>
-        <form onSubmit={handleLogin}>
-          <div className="form-group">
-            <label>Usuario</label>
-            <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} />
-          </div>
-          <div className="form-group">
-            <label>Password</label>
-            <input type="password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} />
-          </div>
-          {error && <p className="text-danger">{error}</p>}
-          <button type="submit" className="btn btn-primary">Enviar</button>
-        </form>
-        <p>¿No tienes cuenta? <a href="/register"></a></p>
+        <div className="login-form">
+          <h2>Login</h2>
+          <form onSubmit={handleLogin}>
+            <div className="form-group">
+              <label>Usuario</label>
+              <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label>Password</label>
+              <input type="password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} />
+            </div>
+            {error && <p className="text-danger">{error}</p>}
+            <button type="submit" className="btn btn-primary">Enviar</button>
+          </form>
+          <p>¿No tienes cuenta? <a href="/register">Regístrate</a></p>
+        </div>
       </div>
     </div>
   );
